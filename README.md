@@ -1,4 +1,5 @@
-PleaseWait.js
+
+This is a Fork of PleaseWait.js
 ===========
 A simple library to show your users a beautiful splash page while your application loads.
 
