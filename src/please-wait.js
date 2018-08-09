@@ -8,7 +8,7 @@
  * DS208: Avoid top-level this
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-(function(root, factory) {
+(function (root, factory) {
   if (typeof exports === "object") {
     // CommonJS
     factory(exports);
@@ -19,7 +19,7 @@
     // Browser globals
     factory(root);
   }
-})(this, function(exports) {
+})(this, function (exports) {
   const elm = document.createElement('fakeelement');
   let animationSupport = false;
   let transitionSupport = false;
@@ -27,11 +27,11 @@
   let transitionEvent = null;
   const domPrefixes = 'Webkit Moz O ms'.split(' ');
   const transEndEventNames = {
-    'WebkitTransition' : 'webkitTransitionEnd',
-    'MozTransition' : 'transitionend',
-    'OTransition' : 'oTransitionEnd',
-    'msTransition' : 'MSTransitionEnd',
-    'transition' : 'transitionend'
+    'WebkitTransition': 'webkitTransitionEnd',
+    'MozTransition': 'transitionend',
+    'OTransition': 'oTransitionEnd',
+    'msTransition': 'MSTransitionEnd',
+    'transition': 'transitionend'
   };
 
   for (let key in transEndEventNames) {
@@ -69,7 +69,7 @@
   }
 
   // Helpers to add/remove classes, since we don't have our friend jQuery
-  const addClass = function(classname, elem) {
+  const addClass = function (classname, elem) {
     if (elem.classList) {
       return elem.classList.add(classname);
     } else {
@@ -77,7 +77,7 @@
     }
   };
 
-  const removeClass = function(classname, elem) {
+  const removeClass = function (classname, elem) {
     if (elem.classList) {
       return elem.classList.remove(classname);
     } else {
@@ -92,18 +92,18 @@
         logo: null,
         loadingHtml: null,
         template: `\
-<div class='pg-loading-inner'>
-  <div class='pg-loading-center-outer'>
-    <div class='pg-loading-center-middle'>
-      <h1 class='pg-loading-logo-header'>
-        <img class='pg-loading-logo'></img>
-      </h1>
-      <div class='pg-loading-html'>
-      </div>
-    </div>
-  </div>
-</div>\
-`,
+          <div class='pg-loading-inner'>
+            <div class='pg-loading-center-outer'>
+              <div class='pg-loading-center-middle'>
+                <h1 class='pg-loading-logo-header'>
+                  <img class='pg-loading-logo'></img>
+                </h1>
+                <div class='pg-loading-html'>
+                </div>
+              </div>
+            </div>
+          </div>\
+        `,
         onLoadedCallback: null
       };
     }
@@ -120,51 +120,77 @@
         this.options[k] = (options[k] != null) ? options[k] : v;
       }
 
+      // Initial element
+
       // Create the loading screen element
       this._loadingElem = document.createElement("div");
-      // Create an empty array to store the potential list of loading HTML (messages, spinners, etc)
-      // we'll be displaying to the screen
-      this._loadingHtmlToDisplay = [];
       // Add a global class for easy styling
       this._loadingElem.className = "pg-loading-screen";
       // Set the background color of the loading screen, if supplied
       if (this.options.backgroundColor != null) { this._loadingElem.style.backgroundColor = this.options.backgroundColor; }
       // Initialize the loading screen's HTML with the defined template. The default can be overwritten via options
       this._loadingElem.innerHTML = this.options.template;
+
+      // TODO
+      // Inner loading html
       // Find the element that will contain the loading HTML displayed to the user (typically a spinner/message)
       // This can be changed via updateLoadingHtml
       this._loadingHtmlElem = this._loadingElem.getElementsByClassName("pg-loading-html")[0];
       // Set the initial loading HTML, if supplied
       if (this._loadingHtmlElem != null) { this._loadingHtmlElem.innerHTML = this.options.loadingHtml; }
-      // Set a flag that lets us know if the transitioning between loading HTML elements is finished.
-      // If true, we can transition immediately to a new message/HTML
-      this._readyToShowLoadingHtml = false;
+
       // Find the element that displays the loading logo and set the src if supplied
       this._logoElem = this._loadingElem.getElementsByClassName("pg-loading-logo")[0];
       if (this._logoElem != null) { this._logoElem.src = this.options.logo; }
+
+
+
+      // Set a flag that lets us know if the transitioning between loading HTML elements is finished.
+      // If true, we can transition immediately to a new message/HTML
+      this._readyToShowLoadingHtml = false;
+
+      // Create an empty array to store the potential list of loading HTML (messages, spinners, etc)
+      // we'll be displaying to the screen
+      this._loadingHtmlToDisplay = [];
+
+
+
+
+
+      // TODO: debug
       // Add the loading screen to the body
       removeClass("pg-loaded", document.body);
       addClass("pg-loading", document.body);
       document.body.appendChild(this._loadingElem);
+
+      // TODO: refactor!
       // Add the CSS class that will trigger the initial transitions of the logo/loading HTML
+      // what??
       addClass("pg-loading", this._loadingElem);
+
+
+
       // Register a callback to invoke when the loading screen is finished
       this._onLoadedCallback = this.options.onLoadedCallback;
 
       // Define a listener to look for any new loading HTML that needs to be displayed after the intiial transition finishes
-      var listener = evt => {
+      var listener = event => {
         this.loaded = true;
         this._readyToShowLoadingHtml = true;
+
         addClass("pg-loaded", this._loadingHtmlElem);
+
+
         if (animationSupport) { this._loadingHtmlElem.removeEventListener(animationEvent, listener); }
+
         if (this._loadingHtmlToDisplay.length > 0) { this._changeLoadingHtml(); }
         if (this.finishing) {
           // If we reach here, it means @finish() was called while we were animating in, so we should
           // call @_finish() immediately. This registers a new event listener, which will fire
           // immediately, instead of waiting for the *next* animation to end. We stop propagation now
           // to prevent this conflict
-          if (evt != null) {
-            evt.stopPropagation();
+          if (event != null) {
+            event.stopPropagation();
           }
           return this._finish();
         }
@@ -320,7 +346,7 @@
   }
   PleaseWait.initClass();
 
-  const pleaseWait = function(options) {
+  const pleaseWait = function (options) {
     if (options == null) { options = {}; }
     return new PleaseWait(options);
   };
